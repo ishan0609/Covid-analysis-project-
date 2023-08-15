@@ -1,6 +1,7 @@
 select *
 from Portfolioproject.dbo.Covidvaccination
  order by 3,4
+
  select *
 from Portfolioproject.dbo.Coviddeathsfinal
 
@@ -15,14 +16,13 @@ from Portfolioproject.dbo.Coviddeathsfinal
 
  Select location, date, total_cases , total_deaths , ( total_deaths / total_cases)* 100 as Deathpercentage
 from Portfolioproject.dbo.Coviddeathsfinal
-Where location like '%states' 
+Where location like '%ndia' 
  order by 1,2
 
  -- total cases vs population  -- population that got covid 
  Select location, date, population , total_cases , ( total_cases /  population)* 100 as cases_percentage_perpopulation
 from Portfolioproject.dbo.Coviddeathsfinal
--- Where location like '%states' AND population is NOT null 
- Where population is NOT null 
+ Where location like '%ndia' AND population is NOT null 
 order by 1,2
 
 -- countries with highest infection rate 
@@ -44,18 +44,16 @@ order by 2 desc
 
 Select continent, MAX(cast(Total_deaths as int)) as TotalDeathCount
 From Portfolioproject.dbo.Coviddeathsfinal 
-
 Where continent is not  null 
 Group by continent
 order by 2 desc
 
 -- GLOBAL NUMBERS
--- Without using the date we have got teh table number and with the date we got data per day  
+-- Without using the date we have got the table number and with the date we got data per day  
 
-Select  /*date*/ SUM(new_cases) as totalnumberof_cases , SUM(cast(new_deaths as int)) as totalnumberofdeaths , (SUM(cast(new_deaths as int)) / SUM(new_cases) )* 100 as Deathpercentage
+Select  SUM(new_cases) as totalnumberof_cases , SUM(cast(new_deaths as int)) as totalnumberofdeaths , (SUM(cast(new_deaths as int)) / SUM(new_cases) )* 100 as Deathpercentage
 from Portfolioproject.dbo.Coviddeathsfinal
 Where continent is not null 
--- group by date
  order by 1,2
 
 
@@ -68,17 +66,15 @@ Where continent is not null
  and 
  death.date = vacci.date
  where death.continent is not null 
-
  order by 2,3
 
 
  -- Using temp tables or the CTE to find out rolling populations 
- -- we found the rooling people vaccination count i.e. count of almost toal vaccination 
+ -- we found the rolling people vaccination count i.e. count of almost toal vaccination 
 
 
  select (death.continent) , death.location, death.population , vacci.new_vaccinations 
  ,SUM(Convert(int, vacci.new_vaccinations )) OVER (PARTITION BY death.location order by death.location , death.date ) as rolllingpeoplevaccinated
-
  from Portfolioproject.dbo.Coviddeathsfinal  death
  JOIN  Portfolioproject.dbo.Covidvaccination vacci on 
  death.location = vacci.location
@@ -95,7 +91,6 @@ Where continent is not null
   (
 Select (death.continent) , death.location,death.date , death.population , vacci.new_vaccinations 
  ,SUM(Convert(int, vacci.new_vaccinations )) OVER (PARTITION BY death.location order by death.location , death.date ) as rolllingpeoplevaccinated
-
  from Portfolioproject.dbo.Coviddeathsfinal  death
  JOIN  Portfolioproject.dbo.Covidvaccination vacci on 
  death.location = vacci.location
@@ -130,7 +125,6 @@ from Portfolioproject.dbo.Coviddeathsfinal  death
 	and death.date = vacci.date
 where death.continent is not null AND  death.population is not null
 --order by 2,3
-
 Select *, (RollingPeopleVaccinated/Population)*100
 From #PercentPopulationVaccinated
 
@@ -152,5 +146,3 @@ where death.continent is not null AND  death.population is not null
 --order by 2,3
 
 --END
-select *
-from  PercentPopulationVaccinated
