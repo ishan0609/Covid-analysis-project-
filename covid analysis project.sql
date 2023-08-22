@@ -69,7 +69,7 @@ Where continent is not null
  order by 2,3
 
 
- -- Using temp tables or the CTE to find out rolling populations 
+ -- Using  the CTE to find out rolling populations 
  -- we found the rolling people vaccination count i.e. count of almost toal vaccination 
 
 
@@ -101,33 +101,6 @@ Select (death.continent) , death.location,death.date , death.population , vacci.
 
  Select *,(rollingpeoplevaccinated/population) * 100 as vaccinationpercentage
  from populationVsVaccination
-
- -- Using Temp Table to perform Calculation on Partition By in previous query
-
-DROP Table if exists #PercentPopulationVaccinated
-Create Table #PercentPopulationVaccinated
-(
-Continent nvarchar(255),
-Location nvarchar(255),
-Date datetime,
-Population numeric,
-New_vaccinations numeric,
-RollingPeopleVaccinated numeric
-)
-
-Insert into #PercentPopulationVaccinated
-Select death.continent, death.location, death.date, death.population, vacci.new_vaccinations
-, SUM(CONVERT(int,vacci.new_vaccinations)) OVER (Partition by death.Location Order by death.location, death.Date) as RollingPeopleVaccinated
---, (RollingPeopleVaccinated/population)*100
-from Portfolioproject.dbo.Coviddeathsfinal  death
- JOIN  Portfolioproject.dbo.Covidvaccination vacci on 
- death.location = vacci.location
-	and death.date = vacci.date
-where death.continent is not null AND  death.population is not null
---order by 2,3
-Select *, (RollingPeopleVaccinated/Population)*100
-From #PercentPopulationVaccinated
-
 
 
 
